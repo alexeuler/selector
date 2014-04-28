@@ -15,4 +15,4 @@ App.config.db.crawler.password = ENV['CRAWLER_DB_PASS']
 App.config.db.crawler.name = ENV['CRAWLER_DB_NAME']
 App.config.db.crawler.host = ENV['CRAWLER_DB_HOST']
 App.config.db.crawler.port = ENV['CRAWLER_DB_PORT']
-App.config.db.adapter = "postgresql"
+App.config.db.crawler.adapter = "postgresql"
