@@ -9,13 +9,10 @@ end
 App.config = OpenStruct.new
 
 App.config.db = OpenStruct.new
-App.config.db.user = ENV['PG_USER']
-App.config.db.password = ENV['PG_PASS']
-App.config.db.name = "crawler"
-App.config.db.host = "localhost"
+App.config.db.crawler = OpenStruct.new
+App.config.db.crawler.user = ENV['CRAWLER_DB_USER']
+App.config.db.crawler.password = ENV['CRAWLER_DB_PASS']
+App.config.db.crawler.name = ENV['CRAWLER_DB_NAME']
+App.config.db.crawler.host = ENV['CRAWLER_DB_HOST']
+App.config.db.crawler.port = ENV['CRAWLER_DB_PORT']
 App.config.db.adapter = "postgresql"
-
-App.config.tokens = OpenStruct.new
-App.config.tokens.user = ENV["TOKENS_USER"]
-App.config.tokens.password = ENV["TOKENS_PASS"]
-App.config.tokens.port = 9292

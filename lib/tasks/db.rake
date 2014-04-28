@@ -27,7 +27,7 @@ db_namespace=namespace :db do
   task :environment do
     establish_db_connection
     ActiveRecord::Migrator.migrations_paths=
-        File.expand_path("../crawler/models/migrations", File.dirname(__FILE__))
+        File.expand_path("../selector/models/migrations", File.dirname(__FILE__))
   end
 
   desc "create database"
