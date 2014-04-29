@@ -39,7 +39,8 @@ module Selector
           vector[index] = 1 if index
           ary += vector
         end if feature_ordinals
-        ary
+        id =self.send(:id)
+        {id.to_s => ary}
       end
 
     end
