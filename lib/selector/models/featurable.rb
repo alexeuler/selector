@@ -27,7 +27,7 @@ module Selector
             ary << (value || 0)
           end
           feature_ordinals.each_pair do |name, states|
-            value = hash[name]
+            value = hash[name.to_s]
             index = states.index(value)
             vector = Array.new(states.count, 0)
             vector[index] = 1 if index
