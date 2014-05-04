@@ -2,6 +2,7 @@ require 'libsvm'
 module Selector
   class Svm
 
+    #ToDo - update path
     PATH = "#{Rails.root}/app/svm_models/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 62
@@ -27,7 +28,6 @@ module Selector
     def train(labels, features)
       raise SVMError, "Empty train set is not allowed" if features.nil? || features.empty? || labels.nil?
       raise SVMError, "Labels and features size mismatch" unless labels.count == features.count
-      features = extract_features(features)
       find_extremes(features)
       features.map! { |f| scale(f) }
       features.map! { |f| Libsvm::Node.features(f) }
@@ -37,14 +37,14 @@ module Selector
       if LOG_ACCURACY
         accuracy = cross_validate labels: labels, features: features,
                                   chunk_size: [labels.count / 10, 1].max, c: param.c, gamma: param.gamma
+        puts "------Accuracy: #{accuracy}"
       end
       @model = Libsvm::Model.train(problem, param)
     end
 
-    def predict_probability(model_or_feature)
-      raise SVMError, "Nil feature is not allowed" if model_or_feature.nil?
+    def predict_probability(feature)
+      raise SVMError, "Nil feature is not allowed" if feature.nil?
       raise SVMError, "Model is not defined" if @model.nil?
-      feature = extract_features([model_or_feature])[0]
       feature = scale(feature)
       feature = Libsvm::Node.features(feature)
       result = @model.predict_probability(feature)
@@ -52,41 +52,6 @@ module Selector
     end
 
     private
-
-    def get_param(args = {})
-      labels = args[:labels]
-      features = args[:features]
-      best = labels.nil? ? {params: [DEFAULT_C, DEFAULT_GAMMA]} : find_optimal_parameters(labels, features)
-      rbf_parameter(best[:params][0], best[:params][1])
-    end
-
-    def find_optimal_parameters(labels, features)
-      best = {params: [], accuracy: 0}
-      cs.each do |c|
-        gammas.each do |gamma|
-          accuracy = cross_validate labels: labels, features: features,
-                                    chunk_size: [labels.count / 10, 1].max, c: c, gamma: gamma
-          if accuracy > best[:accuracy]
-            best[:accuracy] = accuracy
-            best[:params] = [c, gamma]
-          end
-        end
-      end
-      best
-    end
-
-
-    def gammas
-      result = []
-      7.times do |i|
-        result << 2 ** (i - 3)
-      end
-      result
-    end
-
-    def cs
-      gammas
-    end
 
     def rbf_parameter(c, gamma)
       parameter = Libsvm::SvmParameter.new
@@ -123,7 +88,6 @@ module Selector
       1 - errors.to_f / labels.count
     end
 
-
     def find_extremes(features)
       size = features[0].length
       @min_vector = features[0].clone
@@ -146,6 +110,45 @@ module Selector
         result << value
       end
       result
+    end
+
+
+
+    # This block is for parameters optimization
+
+    def get_param(args = {})
+      labels = args[:labels]
+      features = args[:features]
+      best = labels.nil? ? {params: [DEFAULT_C, DEFAULT_GAMMA]} : find_optimal_parameters(labels, features)
+      rbf_parameter(best[:params][0], best[:params][1])
+    end
+
+    def find_optimal_parameters(labels, features)
+      best = {params: [], accuracy: 0}
+      cs.each do |c|
+        gammas.each do |gamma|
+          accuracy = cross_validate labels: labels, features: features,
+                                    chunk_size: [labels.count / 10, 1].max, c: c, gamma: gamma
+          if accuracy > best[:accuracy]
+            best[:accuracy] = accuracy
+            best[:params] = [c, gamma]
+          end
+        end
+      end
+      best
+    end
+
+
+    def gammas
+      result = []
+      7.times do |i|
+        result << 2 ** (i - 3)
+      end
+      result
+    end
+
+    def cs
+      gammas
     end
 
   end
