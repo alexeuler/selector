@@ -1,7 +1,11 @@
-def test(data)
-  data ||= {}
+module Test
+  def a
+    puts self
+  end
 end
 
-data = nil
-test(data)
-puts data
+class B
+  extend Test
+end
+
+B.a

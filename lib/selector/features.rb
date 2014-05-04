@@ -22,10 +22,10 @@ module Selector
 
     def update
       max_id = @features.count > 0 ? @features.last[0] : 0
-      posts = Post.where("id > ?", max_id)
+      posts = Base.connection.execute("select * from posts where id > #{max_id}")#Post.where("id > ?", max_id).to_a
       result = posts.map do |post|
-        tuple = [post.id]
-        tuple += post.to_feature
+        tuple = [post[:id]]
+        tuple += Post.to_feature(post)
         tuple
       end
       @features += result
