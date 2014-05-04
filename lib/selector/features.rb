@@ -7,10 +7,11 @@ module Selector
     DELAY = 60
     include Celluloid
     extend Forwardable
-    def_delegators :@features, :[], :[]=, :first, :last, :count, :length, :each, :map, :map!
+    def_delegators :@features, :[], :[]=, :count, :length, :each, :map, :map!, :each_key,
+                   :each_pair, :each_with_index, :keys, :values
 
     def initialize
-      @features = []
+      @features = {}
     end
 
     def start
@@ -21,14 +22,11 @@ module Selector
     end
 
     def update
-      max_id = @features.count > 0 ? @features.last[0] : 0
+      max_id = @features.count > 0 ? @features.keys.max : 0
       posts = Base.connection.execute("select * from posts where id > #{max_id}")
-      result = posts.map do |post|
-        tuple = [post['id'].to_i]
-        tuple += Post.to_feature(post)
-        tuple
-      end
-      @features += result
+      result = {}
+      posts.each { |post| result[post['id'].to_i] = Post.to_feature(post)}
+      @features.merge! result
       result
     end
   end
