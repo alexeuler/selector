@@ -4,7 +4,7 @@ require 'forwardable'
 
 module Selector
   class Features
-    DELAY = 1
+    DELAY = 60
     include Celluloid
     extend Forwardable
     def_delegators :@features, :[], :[]=, :first, :last, :count, :length, :each, :map, :map!
@@ -22,7 +22,7 @@ module Selector
 
     def update
       max_id = @features.count > 0 ? @features.last[0] : 0
-      posts = Base.connection.execute("select * from posts where id > #{max_id}")#Post.where("id > ?", max_id).to_a
+      posts = Base.connection.execute("select * from posts where id > #{max_id}")
       result = posts.map do |post|
         tuple = [post['id'].to_i]
         tuple += Post.to_feature(post)
