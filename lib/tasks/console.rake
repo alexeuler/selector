@@ -9,7 +9,6 @@ task :console do
   ARGV.clear
   include Selector
   include Selector::Models::Crawler
-  @features = Features.new
-  @features.async.start
+  require_relative("../config/boot")
   IRB.start
 end

@@ -1,8 +1,8 @@
 require 'ostruct'
 
-module App
+class App
   class << self
-    attr_accessor :config
+    attr_accessor :config, :redis, :features
   end
 end
 
@@ -16,3 +16,9 @@ App.config.db.crawler.name = ENV['CRAWLER_DB_NAME']
 App.config.db.crawler.host = ENV['CRAWLER_DB_HOST']
 App.config.db.crawler.port = ENV['CRAWLER_DB_PORT']
 App.config.db.crawler.adapter = "postgresql"
+
+App.config.db.front = OpenStruct.new
+App.config.db.front.host = ENV['FRONT_DB_HOST']
+App.config.db.front.port = ENV['FRONT_DB_PORT']
+App.config.db.front.password = ENV['FRONT_DB_PASS']
+App.config.db.front.name = ENV['FRONT_DB_NAME']
