@@ -2,8 +2,7 @@ require 'libsvm'
 module Selector
   class Svm
 
-    #ToDo - update path
-    PATH = "app/svm_models/"
+    PATH = "#{App.root}/storage/svm/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 62
     LOG_ACCURACY = false

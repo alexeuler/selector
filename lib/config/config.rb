@@ -6,7 +6,11 @@ class App
   end
 end
 
+
+
 App.config = OpenStruct.new
+App.config.root = File.expand_path("../..",
+                            File.dirname(__FILE__))
 
 App.config.db = OpenStruct.new
 App.config.db.crawler = OpenStruct.new

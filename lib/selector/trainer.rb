@@ -23,9 +23,9 @@ module Selector
       @svm = Svm.new user_id:user_id
       @svm.train(labels,features)
       @svm.save
-      ids = predict
-      #ToDo delete old
-      @redis.linsert "posts:#{user_id}", ids
+      ids = get_top
+      @redis.ltrim "posts:best:#{user_id}", -1, 0
+      @redis.rpush "posts:best:#{user_id}", ids
     end
 
     def get_likes(user_id)
@@ -43,7 +43,7 @@ module Selector
       result = []
       @features_collection.each_pair do |id, feature|
         label_and_prob = @svm.predict_probability(feature)
-        result.push([id, label_and_prob[:prob]) if label_and_prob[:label] == 1
+        result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end
       result.sort {|a,b| b[1] <=> a[1]}
       result.map! {|x| x[0]}
