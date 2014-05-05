@@ -8,7 +8,7 @@ module Selector
             host: App.config.db.crawler.host,
             port: App.config.db.crawler.port,
             database: App.config.db.crawler.name,
-            username: App.config.db.crawler.user,
+            username: App.config.db.crawler.user_id,
             password: App.config.db.crawler.password,
             reaping_frequency: 10,
             pool: 5

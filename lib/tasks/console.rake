@@ -10,5 +10,6 @@ task :console do
   include Selector
   include Selector::Models::Crawler
   require_relative("../config/boot")
+  require_relative "../selector/trainer"
   IRB.start
 end

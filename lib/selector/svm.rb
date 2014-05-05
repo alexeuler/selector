@@ -3,7 +3,7 @@ module Selector
   class Svm
 
     #ToDo - update path
-    PATH = "#{Rails.root}/app/svm_models/"
+    PATH = "app/svm_models/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 62
     LOG_ACCURACY = false
@@ -11,18 +11,18 @@ module Selector
     class SVMError < RuntimeError
     end
 
-    def self.load(user)
-      model = Libsvm::Model.load("#{PATH}#{user.email}")
-      self.new(model: model, user: user)
+    def self.load(user_id)
+      model = Libsvm::Model.load("#{PATH}#{user_id}")
+      self.new(model: model, user_id: user_id)
     end
 
     def initialize(args = {})
       @model = args[:model]
-      @user = args[:user]
+      @user_id = args[:user_id]
     end
 
-    def save
-      @model.save("#{PATH}#{@user.email}")
+    def save111
+      @model.save("#{PATH}#{@user_id}")
     end
 
     def train(labels, features)
