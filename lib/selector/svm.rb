@@ -4,7 +4,7 @@ module Selector
 
     PATH = "#{App.root}/storage/svm/"
     DEFAULT_C = 11
-    DEFAULT_GAMMA = 62
+    DEFAULT_GAMMA = 1
     LOG_ACCURACY = false
 
     class SVMError < RuntimeError
