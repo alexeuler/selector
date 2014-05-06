@@ -8,6 +8,7 @@ module Selector
 
     DISCARD_LIKES_COUNT = 10 #because these are set to 0 by default and w8s for votes
     MAX_NEW_POSTS = 1000
+
     def initialize(args={})
       @redis = args[:redis]
       @features_collection = args[:features_collection]
@@ -17,8 +18,8 @@ module Selector
       likes_hash = get_likes(user_id)
       train_ids, labels = likes_hash.keys.map(&:to_i), likes_hash.values.map(&:to_i)
       features = get_features(train_ids)
-      @svm = Svm.new user_id:user_id
-      @svm.train(labels,features)
+      @svm = Svm.new user_id: user_id
+      @svm.train(labels, features)
       @svm.save
       top_ids = get_top(except: train_ids)
       @redis.ltrim "posts:best:#{user_id}", -1, 0
@@ -30,19 +31,22 @@ module Selector
     end
 
     def get_features(ids)
-      ids.map {|id| @features_collection[id]}
+      ids.map { |id| @features_collection[id] }
     end
 
     def get_top(args = {})
       except_ids = args[:except] || []
       result = []
+      i=0
       @features_collection.each_pair do |id, feature|
         next if except_ids.include?(id)
+        i+=1
+        puts i if i%1000==0
         label_and_prob = @svm.predict_probability(feature)
         result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end
-      result.sort {|a,b| b[1] <=> a[1]}
-      result.map! {|x| x[0]}
+      result.sort { |a, b| b[1] <=> a[1] }
+      result.map! { |x| x[0] }
       result.first(MAX_NEW_POSTS)
     end
 

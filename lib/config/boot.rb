@@ -7,8 +7,9 @@ Helpers.require_dir(File.expand_path("../selector/models/crawler",
 require_relative '../selector/features'
 require_relative '../selector/trainer'
 
-App.features = Selector::Features.new
-App.features.async.start
+App.features = {}
+fetcher = Selector::Features.new(features: App.features)
+fetcher.async.start
 App.redis = Redis.new(:host => App.config.db.front.host , :port => App.config.db.front.port,
                       :db => App.config.db.front.name)
 App.redis.auth(App.config.db.front.password)

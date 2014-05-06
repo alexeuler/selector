@@ -20,7 +20,7 @@ module Selector
       @user_id = args[:user_id]
     end
 
-    def save111
+    def save
       @model.save("#{PATH}#{@user_id}")
     end
 
