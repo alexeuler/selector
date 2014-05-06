@@ -2,15 +2,15 @@ require 'ostruct'
 
 class App
   class << self
-    attr_accessor :config, :redis, :features
+    attr_accessor :config, :redis, :features, :root
   end
 end
 
 
+App.root = File.expand_path("../..",
+                            File.dirname(__FILE__))
 
 App.config = OpenStruct.new
-App.config.root = File.expand_path("../..",
-                            File.dirname(__FILE__))
 
 App.config.db = OpenStruct.new
 App.config.db.crawler = OpenStruct.new

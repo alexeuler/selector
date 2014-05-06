@@ -15,7 +15,7 @@ module Selector
 
     def train(user_id)
       likes_hash = get_likes(user_id)
-      train_ids, labels = likes_hash.keys, likes_hash.values
+      train_ids, labels = likes_hash.keys.map(&:to_i), likes_hash.values.map(&:to_i)
       features = get_features(train_ids)
       @svm = Svm.new user_id:user_id
       @svm.train(labels,features)
@@ -26,7 +26,7 @@ module Selector
     end
 
     def get_likes(user_id)
-      @redis.hmgetall("likes:#{user_id}")
+      @redis.hgetall("likes:#{user_id}")
     end
 
     def get_features(ids)

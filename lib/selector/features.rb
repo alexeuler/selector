@@ -4,7 +4,7 @@ require 'forwardable'
 
 module Selector
   class Features
-    DELAY = 60
+    DELAY = 600
     include Celluloid
     extend Forwardable
     def_delegators :@features, :[], :[]=, :count, :length, :each, :map, :map!, :each_key,
@@ -25,7 +25,7 @@ module Selector
       max_id = @features.count > 0 ? @features.keys.max : 0
       posts = Models::Crawler::Base.connection.execute("select * from posts where id > #{max_id}")
       result = {}
-      posts.each { |post| result[post['id'].to_i] = Post.to_feature(post)}
+      posts.each { |post| result[post['id'].to_i] = Models::Crawler::Post.to_feature(post)}
       @features.merge! result
       result
     end

@@ -1,6 +1,7 @@
 require_relative "helpers"
 require_relative "config"
 require 'redis'
+require 'active_record'
 Helpers.require_dir(File.expand_path("../selector/models/crawler",
                                      File.dirname(__FILE__)))
 require_relative '../selector/features'
