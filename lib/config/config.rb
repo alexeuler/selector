@@ -26,3 +26,6 @@ App.config.db.front.host = ENV['FRONT_DB_HOST']
 App.config.db.front.port = ENV['FRONT_DB_PORT']
 App.config.db.front.password = ENV['FRONT_DB_PASS']
 App.config.db.front.name = ENV['FRONT_DB_NAME']
+
+App.config.rack = OpenStruct.new
+App.config.rack.port = 9010
