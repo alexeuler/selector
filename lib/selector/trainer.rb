@@ -20,7 +20,6 @@ module Selector
       features = get_features(train_ids)
       @svm = Svm.new user_id: user_id
       @svm.train(labels, features)
-      @svm.save
       top_ids = get_top(except: train_ids)
       @redis.del "posts:best:#{user_id}"
       @redis.rpush "posts:best:#{user_id}", top_ids
@@ -37,11 +36,8 @@ module Selector
     def get_top(args = {})
       except_ids = args[:except] || []
       result = []
-      i=0
       @features_collection.each_pair do |id, feature|
         next if except_ids.include?(id)
-        i+=1
-        puts i if i%10000==0
         label_and_prob = @svm.predict_probability(feature)
         result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end

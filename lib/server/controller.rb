@@ -4,10 +4,8 @@ class Controller
   def call(env)
     params = params(env)
     user_id = params["user_id"].to_i
-    Selector::select(user_id)
-    response=Rack::Response.new
-    response.finish
-    response
+    Selector::select(user_id) if user_id>0
+    [200, {}, []]
   end
 
   def params(env)
