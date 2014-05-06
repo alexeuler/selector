@@ -9,6 +9,9 @@ require_relative '../selector/trainer'
 
 App.features = {}
 fetcher = Selector::Features.new(features: App.features)
+puts "Loading features..."
+fetcher.update
+puts "Done"
 fetcher.async.start
 App.redis = Redis.new(:host => App.config.db.front.host , :port => App.config.db.front.port,
                       :db => App.config.db.front.name)

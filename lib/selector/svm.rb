@@ -47,7 +47,7 @@ module Selector
       feature = scale(feature)
       feature = Libsvm::Node.features(feature)
       result = @model.predict_probability(feature)
-      {label: result[0], prob: result[1].max}
+      {label: result[0].round(0), prob: result[1].max}
     end
 
     private

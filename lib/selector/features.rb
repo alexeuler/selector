@@ -6,9 +6,6 @@ module Selector
   class Features
     DELAY = 600
     include Celluloid
-    extend Forwardable
-    def_delegators :@features, :[], :[]=, :count, :length, :each, :map, :map!, :each_key,
-                   :each_pair, :each_with_index, :keys, :values
 
     def initialize(args = {})
       @features = args[:features]
@@ -27,7 +24,6 @@ module Selector
       result = {}
       posts.each { |post| result[post['id'].to_i] = Models::Crawler::Post.to_feature(post)}
       @features.merge! result
-      puts "#{Time.now} - Updated features"
       result
     end
   end
