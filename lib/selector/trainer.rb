@@ -4,7 +4,7 @@ module Selector
 
   class Trainer
     # likes schema:
-    # likes:user_id: zset(post_id:like_value, timestamp)
+    # likes:user_id: hash(post_id:like_value)
 
     DISCARD_LIKES_COUNT = 10 #because these are set to 0 by default and w8s for votes
     MAX_NEW_POSTS = 1000
@@ -14,32 +14,27 @@ module Selector
     end
 
     def train(user_id)
-      train_ids, labels = [], []
-      get_likes(user_id).each do |pair|
-        train_ids << pair[0]
-        labels << pair[1]
-      end
+      likes_hash = get_likes(user_id)
+      train_ids, labels = likes_hash.keys, likes_hash.values
       features = get_features(train_ids)
       @svm = Svm.new user_id:user_id
       @svm.train(labels,features)
       @svm.save
-      top_ids = get_top(train_ids)
+      top_ids = get_top(except: train_ids)
       @redis.ltrim "posts:best:#{user_id}", -1, 0
       @redis.rpush "posts:best:#{user_id}", top_ids
     end
 
     def get_likes(user_id)
-      likes = @redis.zrange("likes:#{user_id}", DISCARD_LIKES_COUNT, -1)
-      likes.map do |like|
-        like.split(":").map(&:to_i)
-      end
+      @redis.hmgetall("likes:#{user_id}")
     end
 
     def get_features(ids)
       ids.map {|id| @features_collection[id]}
     end
 
-    def get_top(except_ids)
+    def get_top(args = {})
+      except_ids = args[:except] || []
       result = []
       @features_collection.each_pair do |id, feature|
         next if except_ids.include?(id)
