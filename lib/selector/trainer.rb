@@ -41,7 +41,7 @@ module Selector
         label_and_prob = @svm.predict_probability(feature)
         result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end
-      result.sort { |a, b| b[1] <=> a[1] }
+      result.sort! { |a, b| b[1] <=> a[1] }
       result.map! { |x| x[0] }
       result.first(MAX_NEW_POSTS)
     end
