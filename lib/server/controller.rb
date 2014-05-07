@@ -6,6 +6,7 @@ class Controller
     params = params(env)
     user_id = params["user_id"].to_i
     Selector::select(user_id) if user_id>0
+    puts "#{Time.now}: Done}"
     [200, {}, []]
   end
 
