@@ -22,7 +22,7 @@ module Selector
       @svm.train(labels, features)
       top_ids = get_top(except: train_ids)
       @redis.del "posts:best:#{user_id}"
-      @redis.rpush "posts:best:#{user_id}", top_ids
+      @redis.rpush "posts:best:#{user_id}", top_ids unless top_ids.empty?
     end
 
     def get_likes(user_id)
