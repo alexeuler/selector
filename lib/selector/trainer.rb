@@ -1,4 +1,5 @@
 require_relative "svm"
+require 'ruby-prof'
 
 module Selector
 
@@ -15,6 +16,7 @@ module Selector
     end
 
     def train(user_id)
+      RubyProf.start
       likes_hash = get_likes(user_id)
       train_ids, labels = likes_hash.keys.map(&:to_i), likes_hash.values.map(&:to_i)
       features = get_features(train_ids)
@@ -23,6 +25,9 @@ module Selector
       top_ids = get_top(except: train_ids)
       @redis.del "posts:best:#{user_id}"
       @redis.rpush "posts:best:#{user_id}", top_ids unless top_ids.empty?
+      result = RubyProf.stop
+      printer = RubyProf::GraphHtmlPrinter.new(result)
+      printer.print(STDOUT)
     end
 
     def get_likes(user_id)

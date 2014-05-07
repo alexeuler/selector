@@ -6,6 +6,7 @@ module Selector
     DEFAULT_C = 11
     DEFAULT_GAMMA = 1
     LOG_ACCURACY = false
+    OPTIMIZE_PARAMS=false
 
     class SVMError < RuntimeError
     end
@@ -118,7 +119,8 @@ module Selector
     def get_param(args = {})
       labels = args[:labels]
       features = args[:features]
-      best = labels.nil? ? {params: [DEFAULT_C, DEFAULT_GAMMA]} : find_optimal_parameters(labels, features)
+      best = (labels.nil? or not OPTIMIZE_PARAMS) ? {params: [DEFAULT_C, DEFAULT_GAMMA]}
+        : find_optimal_parameters(labels, features)
       rbf_parameter(best[:params][0], best[:params][1])
     end
 
