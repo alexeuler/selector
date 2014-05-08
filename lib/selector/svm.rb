@@ -28,8 +28,9 @@ module Selector
     def train(labels, features)
       raise SVMError, "Empty train set is not allowed" if features.nil? || features.empty? || labels.nil?
       raise SVMError, "Labels and features size mismatch" unless labels.count == features.count
+      @feature_template = Array.new(features[0].length, Libsvm::Node.new)
       find_extremes(features)
-      features.map! { |f| scale(f) }
+      features.map! { |f| scale_and_clone(f) }
       problem = Libsvm::Problem.new
       problem.set_examples(labels, features)
       param = get_param
@@ -45,7 +46,6 @@ module Selector
       raise SVMError, "Nil feature is not allowed" if feature.nil?
       raise SVMError, "Model is not defined" if @model.nil?
       feature = scale(feature)
-      feature = Libsvm::Node.features(feature)
       result = @model.predict_probability(feature)
       {label: result[0].round(0), prob: result[1].max}
     end
@@ -89,29 +89,40 @@ module Selector
 
     def find_extremes(features)
       size = features[0].length
-      @min_vector = features[0].clone
-      @max_vector = features[0].clone
+      @min_vector = features[0].map(&:value)
+      @max_vector = features[0].map(&:value)
       features.each do |feature|
         (0..size-1).each do |i|
-          @max_vector[i] = feature[i] if feature[i].value > @max_vector[i].value
-          @min_vector[i] = feature[i] if feature[i].value < @min_vector[i].value
+          @max_vector[i] = feature[i].value if feature[i].value > @max_vector[i]
+          @min_vector[i] = feature[i].value if feature[i].value < @min_vector[i]
         end
       end
     end
 
+    # This is optimized scale that uses prebuilt template
+    # The result is valid only before the next call
     def scale(feature)
-      result = []
-      size = feature.length
-      (0..size-1).each do |i|
+      feature.length.times do |i|
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
-        value = @max_vector[i].value == @min_vector[i].value ? @max_vector[i].value
-          : (feature[i].value - @min_vector[i].value).to_f / (@max_vector[i].value - @min_vector[i].value)
+        @feature_template[i].value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
+          : (feature[i].value - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
+      end
+      @feature_template
+    end
+
+    # This scale creates a clone of example
+    def scale_and_clone(feature)
+      result = []
+      feature.length.times do |i|
+        # note that if the vector outside training set contains new feature value
+        # (and training set contained only one other value) it'll be ignored
+        value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
+        : (feature[i].value - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
         result << Libsvm::Node.new(i, value)
       end
       result
     end
-
 
 
     # This block is for parameters optimization
