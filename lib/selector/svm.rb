@@ -5,7 +5,7 @@ module Selector
     PATH = "#{App.root}/storage/svm/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 1
-    LOG_ACCURACY = false
+    LOG_ACCURACY = true
     OPTIMIZE_PARAMS=true
 
     class SVMError < RuntimeError
@@ -28,12 +28,12 @@ module Selector
     def train(labels, features)
       raise SVMError, "Empty train set is not allowed" if features.nil? || features.empty? || labels.nil?
       raise SVMError, "Labels and features size mismatch" unless labels.count == features.count
-      @feature_template = Array.new(features[0].length, Libsvm::Node.new)
+      @feature_template = (0..features[0].length-1).map {Libsvm::Node.new}
       find_extremes(features)
       features.map! { |f| scale_and_clone(f) }
       problem = Libsvm::Problem.new
       problem.set_examples(labels, features)
-      param = get_param
+      param = get_param(labels:labels, features:features)
       if LOG_ACCURACY
         accuracy = cross_validate labels: labels, features: features,
                                   chunk_size: [labels.count / 10, 1].max, c: param.c, gamma: param.gamma
@@ -82,18 +82,21 @@ module Selector
         param = rbf_parameter(c, gamma)
         model = Libsvm::Model.train(problem, param)
         test_labels.count.times do |i|
-          errors +=1 unless test_labels[i] == model.predict(test_features[i])
+          # errors +=1 unless test_labels[i] == model.predict(test_features[i])
+          errors +=1 if test_labels[i] == 1 and model.predict(test_features[i]) == 0
         end
       end
-      1 - errors.to_f / labels.count
+      accuracy = 1 - errors.to_f / labels.count(1)
+      # puts "----ACC: #{accuracy}"
+      accuracy
     end
 
     def find_extremes(features)
       size = features[0].length
-      @min_vector = features[0]
-      @max_vector = features[0]
+      @min_vector = features[0].clone
+      @max_vector = features[0].clone
       features.each do |feature|
-        (0..size-1).each do |i|
+        size.times do |i|
           @max_vector[i] = feature[i] if feature[i] > @max_vector[i]
           @min_vector[i] = feature[i] if feature[i] < @min_vector[i]
         end
@@ -108,7 +111,7 @@ module Selector
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
         @feature_template[i].value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
-          : (feature[i] - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
+          : (feature[i] - @min_vector[i]).to_f / (@max_vector[i] - @min_vector[i])
       end
       @feature_template
     end
@@ -120,7 +123,7 @@ module Selector
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
         value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
-        : (feature[i] - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
+        : (feature[i] - @min_vector[i]).to_f / (@max_vector[i] - @min_vector[i])
         result << Libsvm::Node.new(i, value)
       end
       result
