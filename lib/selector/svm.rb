@@ -47,7 +47,8 @@ module Selector
       raise SVMError, "Model is not defined" if @model.nil?
       feature = scale(feature)
       result = @model.predict_probability(feature)
-      {label: result[0].round(0), prob: result[1].max}
+      {label: result[0].round(0),
+       prob: result[1][0] > result[1][1] ? result[1][0] : result[1][1]}
     end
 
     private
@@ -101,6 +102,7 @@ module Selector
 
     # This is optimized scale that uses prebuilt template
     # The result is valid only before the next call
+    # This thing is way faster than with clone example
     def scale(feature)
       feature.length.times do |i|
         # note that if the vector outside training set contains new feature value

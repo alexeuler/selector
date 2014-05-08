@@ -16,7 +16,6 @@ module Selector
     end
 
     def train(user_id)
-      # RubyProf.start
       likes_hash = get_likes(user_id)
       train_ids, labels = likes_hash.keys.map(&:to_i), likes_hash.values.map(&:to_i)
       features = get_features(train_ids)
@@ -25,9 +24,6 @@ module Selector
       top_ids = get_top(except: train_ids)
       @redis.del "posts:best:#{user_id}"
       @redis.rpush "posts:best:#{user_id}", top_ids unless top_ids.empty?
-      # result = RubyProf.stop
-      # printer = RubyProf::GraphHtmlPrinter.new(result)
-      # File.open(App.root+"/profiling/profile.html", "w") {|file| printer.print(file)}
     end
 
     def get_likes(user_id)
@@ -40,9 +36,12 @@ module Selector
 
     def get_top(args = {})
       except_ids = args[:except] || []
+      #The hash is for the optimization of lookup speed
+      except_hash = {}
+      except_ids.each {|id| except_hash[id]=true}
       result = []
       @features_collection.each_pair do |id, feature|
-        next if except_ids.include?(id)
+        next if except_hash[id]
         label_and_prob = @svm.predict_probability(feature)
         result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end
