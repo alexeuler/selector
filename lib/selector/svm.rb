@@ -30,7 +30,6 @@ module Selector
       raise SVMError, "Labels and features size mismatch" unless labels.count == features.count
       find_extremes(features)
       features.map! { |f| scale(f) }
-      features.map! { |f| Libsvm::Node.features(f) }
       problem = Libsvm::Problem.new
       problem.set_examples(labels, features)
       param = get_param
@@ -94,8 +93,8 @@ module Selector
       @max_vector = features[0].clone
       features.each do |feature|
         (0..size-1).each do |i|
-          @max_vector[i] = feature[i] if feature[i] > @max_vector[i]
-          @min_vector[i] = feature[i] if feature[i] < @min_vector[i]
+          @max_vector[i] = feature[i] if feature[i].value > @max_vector[i].value
+          @min_vector[i] = feature[i] if feature[i].value < @min_vector[i].value
         end
       end
     end
@@ -106,8 +105,9 @@ module Selector
       (0..size-1).each do |i|
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
-        value = @max_vector[i] == @min_vector[i] ? @max_vector[i] : (feature[i] - @min_vector[i]).to_f / (@max_vector[i] - @min_vector[i])
-        result << value
+        value = @max_vector[i].value == @min_vector[i].value ? @max_vector[i].value
+          : (feature[i].value - @min_vector[i].value).to_f / (@max_vector[i].value - @min_vector[i].value)
+        result << Libsvm::Node.new(i, value)
       end
       result
     end

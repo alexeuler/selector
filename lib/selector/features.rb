@@ -20,7 +20,7 @@ module Selector
 
     def update
       max_id = @features.count > 0 ? @features.keys.max : 0
-      posts = Models::Crawler::Base.connection.execute("select * from posts where id > #{max_id}")#order by id limit 5000 ")
+      posts = Models::Crawler::Base.connection.execute("select * from posts where id > #{max_id} order by id limit 5000")
       result = {}
       posts.each { |post| result[post['id'].to_i] = Models::Crawler::Post.to_feature(post)}
       @features.merge! result

@@ -1,3 +1,4 @@
+require 'libsvm'
 module Selector
   module Models
     module Featurable
@@ -33,7 +34,7 @@ module Selector
             vector[index] = 1 if index
             ary += vector
           end if feature_ordinals
-          ary
+          ary.each_with_index.map {|x, i| Libsvm::Node.new(i, x)}
         end
 
       end
