@@ -28,7 +28,7 @@ module Selector
     def train(labels, features)
       raise SVMError, "Empty train set is not allowed" if features.nil? || features.empty? || labels.nil?
       raise SVMError, "Labels and features size mismatch" unless labels.count == features.count
-      @feature_template = (0..features[0].length-1).map {Libsvm::Node.new}
+      @feature_template = (0..features[0].length-1).map {|i| Libsvm::Node.new(i,0)}
       find_extremes(features)
       features.map! { |f| scale_and_clone(f) }
       problem = Libsvm::Problem.new
