@@ -34,7 +34,7 @@ module Selector
             vector[index] = 1 if index
             ary += vector
           end if feature_ordinals
-          ary.each_with_index.map {|x, i| Libsvm::Node.new(i, x)}
+          ary
         end
 
       end

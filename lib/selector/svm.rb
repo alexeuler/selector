@@ -90,12 +90,12 @@ module Selector
 
     def find_extremes(features)
       size = features[0].length
-      @min_vector = features[0].map(&:value)
-      @max_vector = features[0].map(&:value)
+      @min_vector = features[0]
+      @max_vector = features[0]
       features.each do |feature|
         (0..size-1).each do |i|
-          @max_vector[i] = feature[i].value if feature[i].value > @max_vector[i]
-          @min_vector[i] = feature[i].value if feature[i].value < @min_vector[i]
+          @max_vector[i] = feature[i] if feature[i] > @max_vector[i]
+          @min_vector[i] = feature[i] if feature[i] < @min_vector[i]
         end
       end
     end
@@ -108,7 +108,7 @@ module Selector
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
         @feature_template[i].value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
-          : (feature[i].value - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
+          : (feature[i] - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
       end
       @feature_template
     end
@@ -120,7 +120,7 @@ module Selector
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
         value = @max_vector[i] == @min_vector[i] ? @max_vector[i]
-        : (feature[i].value - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
+        : (feature[i] - @min_vector[i]) / (@max_vector[i] - @min_vector[i])
         result << Libsvm::Node.new(i, value)
       end
       result
