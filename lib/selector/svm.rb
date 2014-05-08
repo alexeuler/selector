@@ -82,13 +82,10 @@ module Selector
         param = rbf_parameter(c, gamma)
         model = Libsvm::Model.train(problem, param)
         test_labels.count.times do |i|
-          # errors +=1 unless test_labels[i] == model.predict(test_features[i])
-          errors +=1 if test_labels[i] == 1 and model.predict(test_features[i]) == 0
+          errors +=1 unless test_labels[i] == model.predict(test_features[i])
         end
       end
-      accuracy = 1 - errors.to_f / labels.count(1)
-      # puts "----ACC: #{accuracy}"
-      accuracy
+      1 - errors.to_f / labels.count
     end
 
     def find_extremes(features)
