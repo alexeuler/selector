@@ -6,7 +6,7 @@ module Selector
     DEFAULT_C = 11
     DEFAULT_GAMMA = 1
     LOG_ACCURACY = false
-    OPTIMIZE_PARAMS=false
+    OPTIMIZE_PARAMS=true
 
     class SVMError < RuntimeError
     end

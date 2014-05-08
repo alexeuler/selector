@@ -27,7 +27,7 @@ module Selector
       @redis.rpush "posts:best:#{user_id}", top_ids unless top_ids.empty?
       result = RubyProf.stop
       printer = RubyProf::GraphHtmlPrinter.new(result)
-      printer.print(App.root+"/profile.html")
+      File.open(App.root+"/profiling/profile.html", "w") {|file| printer.print(file)}
     end
 
     def get_likes(user_id)
