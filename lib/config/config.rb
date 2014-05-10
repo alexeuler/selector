@@ -2,7 +2,7 @@ require 'ostruct'
 
 class App
   class << self
-    attr_accessor :config, :redis, :features, :root
+    attr_accessor :config, :redis, :examples, :root
   end
 end
 
