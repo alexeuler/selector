@@ -28,7 +28,9 @@ module Selector
     end
 
     def get_likes(user_id)
-      @redis.hgetall("likes:#{user_id}")
+      hash = @redis.hgetall("likes:#{user_id}")
+      hash.each_pair {|k,v| hash[k] = v.split(":")[0]}
+      hash
     end
 
     def get_examples(ids)
