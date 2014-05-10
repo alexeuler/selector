@@ -17,7 +17,7 @@ module Selector
           @feature_names = feature_ordinals.nil? ? @feature_names : @feature_names - feature_ordinals.keys.map(&:to_sym)
         end
 
-        def to_feature(hash)
+        def to_example(hash)
           feature_ordinals = self.feature_ordinals
           feature_lambdas = self.feature_lambdas
           feature_names = self.feature_names
@@ -44,8 +44,8 @@ module Selector
       end
 
 
-      def to_feature
-        self.class.to_feature(self.attributes)
+      def to_example
+        self.class.to_example(self.attributes)
       end
 
     end

@@ -10,7 +10,7 @@ module Selector
     return if time_lock != nil and
         Time.now.to_i - time_lock < MINIMUM_TRAINING_TIME_INTERVAL
     App.redis.hset("lock:train", user_id, Time.now.to_i)
-    trainer = Trainer.new(redis: App.redis, features_collection: App.features)
+    trainer = Trainer.new(redis: App.redis, examples_collection: App.examples)
     trainer.train(user_id)
   end
 

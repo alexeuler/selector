@@ -12,15 +12,15 @@ module Selector
 
     def initialize(args={})
       @redis = args[:redis]
-      @features_collection = args[:features_collection]
+      @examples_collection = args[:examples_collection]
     end
 
     def train(user_id)
       likes_hash = get_likes(user_id)
       train_ids, labels = likes_hash.keys.map(&:to_i), likes_hash.values.map(&:to_i)
-      features = get_features(train_ids)
+      examples = get_examples(train_ids)
       @svm = Svm.new user_id: user_id
-      @svm.train(labels, features)
+      @svm.train(labels, examples)
       @svm.save
       top_ids = get_top(except: train_ids)
       @redis.del "posts:best:#{user_id}"
@@ -31,8 +31,8 @@ module Selector
       @redis.hgetall("likes:#{user_id}")
     end
 
-    def get_features(ids)
-      ids.map { |id| @features_collection[id] }
+    def get_examples(ids)
+      ids.map { |id| @examples_collection[id] }
     end
 
     def get_top(args = {})
@@ -41,9 +41,9 @@ module Selector
       except_hash = {}
       except_ids.each {|id| except_hash[id]=true}
       result = []
-      @features_collection.each_pair do |id, feature|
+      @examples_collection.each_pair do |id, example|
         next if except_hash[id]
-        label_and_prob = @svm.predict_probability(feature)
+        label_and_prob = @svm.predict_probability(example)
         result.push([id, label_and_prob[:prob]]) if label_and_prob[:label] == 1
       end
       result.sort! { |a, b| b[1] <=> a[1] }

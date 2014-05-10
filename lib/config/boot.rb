@@ -4,11 +4,11 @@ require 'redis'
 require 'active_record'
 Helpers.require_dir(File.expand_path("../selector/models/crawler",
                                      File.dirname(__FILE__)))
-require_relative '../selector/features'
+require_relative '../selector/examples'
 require_relative '../selector/trainer'
 
-App.features = {}
-fetcher = Selector::Features.new(features: App.features)
+App.examples = {}
+fetcher = Selector::Examples.new(examples: App.examples)
 puts "Loading features..."
 fetcher.update
 puts "Done"
