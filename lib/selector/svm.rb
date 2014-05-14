@@ -48,7 +48,7 @@ module Selector
       example = scale(example)
       result = @model.predict_probability(example)
       {label: result[0].round(0),
-       prob: result[1][0] > result[1][1] ? result[1][0] : result[1][1]}
+       prob: result[1][0] > (result[1][1] || 0) ? result[1][0] : result[1][1]}
     end
 
     private
