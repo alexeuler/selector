@@ -3,7 +3,7 @@ require_relative "../selector"
 
 class Controller
   def call(env)
-    puts "#{Time.now}: Received request: #{env['REQUEST_URI']}"
+    $logger.info "#{Time.now}: Received request: #{env['REQUEST_URI']}"
     params = params(env)
     task = task(env)
     case task
@@ -12,7 +12,7 @@ class Controller
         return [200, {}, ["Invalid user_id: #{user_id}"]] if user_id <=0
         train(user_id)
     end
-    puts "#{Time.now}: Done"
+    $logger.info "#{Time.now}: Done"
     [200, {}, []]
   end
 

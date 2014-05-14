@@ -5,7 +5,7 @@ module Selector
     PATH = "#{App.root}/storage/svm/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 1
-    LOG_ACCURACY = true
+    LOG_ACCURACY = false
     OPTIMIZE_PARAMS=false
 
     class SVMError < RuntimeError
@@ -37,7 +37,7 @@ module Selector
       if LOG_ACCURACY
         accuracy = cross_validate labels: labels, examples: examples,
                                   chunk_size: [labels.count / 10, 1].max, c: param.c, gamma: param.gamma
-        puts "------Accuracy: #{accuracy}"
+        $logger.info "Accuracy: #{accuracy}"
       end
       @model = Libsvm::Model.train(problem, param)
     end
